@@ -14,6 +14,8 @@ class AuthController
 
     public function login()
     {
+        
+        
         // 送信された値の前後の空白（スペース）を取り除く
         $email = isset($_POST['email']) ? trim($_POST['email']) : '';
         $password = isset($_POST['password']) ? trim($_POST['password']) : '';
@@ -48,7 +50,7 @@ class AuthController
 public function register()
 {
     $email = $_POST['email'];
-    $password = $_POST['password'];
+    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
 
     // すでに存在チェック（任意）
     $exists = User::findByEmail($email);

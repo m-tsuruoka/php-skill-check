@@ -22,7 +22,7 @@ public static function create(array $data): void
     $stmt->execute([
         ':name' => $data['name'],
         ':email' => $data['email'],
-        ':password' => password_hash($data['password'], PASSWORD_DEFAULT),
+        ':password' => $data['password'],
     ]);
 }
 }
