@@ -12,7 +12,7 @@ use App\Models\Category;
 class BookController
 {
     /** 一覧表示（実装済みの見本） */
-     public function index(): void
+    public function index(): void
     {
         $books = Book::all();
         view('books/index', ['books' => $books]);
@@ -120,6 +120,16 @@ class BookController
     /** ★応用課題: 削除処理 */
     public function delete(): void
     {
-        // TODO: ここを実装する
+        $id = $_POST['id'] ?? null;
+
+        if (!$id) {
+            header('Location: /');
+            exit;
+        }
+
+        Book::delete((int)$id);
+
+        header('Location: /?page=index&deleted=1');
+        exit;
     }
 }
