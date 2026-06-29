@@ -36,7 +36,7 @@ $old = $old ?? [];
         <label for="title">タイトル</label>
         <input type="text" id="title" name="title" value="<?= e($old['title'] ?? '') ?>">
         <?php if (!empty($errors['title'])): ?>
-            <p class="error" style="color: red;"><?= e($errors['title']) ?></p>
+            <p class="error" style="color: red;"><?= e($errors['title']) ?> </p>
         <?php endif; ?>
     </div>
 
