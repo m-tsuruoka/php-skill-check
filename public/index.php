@@ -1,51 +1,79 @@
 <?php
 
+require_once __DIR__ . '/../bootstrap.php';
+// ※もし requireLogin() 関数が bootstrap.php 以外（authservice.phpなど）に書かれている場合は、
+// そのファイルをここで require_once で読み込んでください。
+
 /**
- * フロントコントローラ（簡易ルータ）。
- * ?page=xxx でコントローラのメソッドに振り分けます。
- *
- * 例:
- *   /              → 書籍一覧（実装済みの見本）
- *   /?page=create  → 新規登録フォーム（★基礎課題で実装）
- *   /?page=store   → 登録処理        （★基礎/応用課題で実装）
- *   /?page=edit    → 編集フォーム      （★応用課題で実装）
- *   /?page=update  → 更新処理         （★応用課題で実装）
- *   /?page=delete  → 削除処理         （★応用課題で実装）
- *
- * 新しいページを足すときは、ここに分岐を追加してコントローラのメソッドを呼びます。
+ * フロントコントローラ（簡易ルータ）
  */
 
-require __DIR__ . '/../bootstrap.php';
-
-use App\Controllers\BookController;
-
 $page = $_GET['page'] ?? 'index';
-$controller = new BookController();
 
+// コントローラ生成
+$bookController = new \App\Controllers\BookController();
+$authController = new \App\Controllers\AuthController();
+
+// ==========================================
+// 【追加】アクセス制限（未ログイン時のブロック）
+// ==========================================
+// ログインが必要なページ（ルーティング名）のリスト
+$requireLoginPages = ['create', 'store', 'edit', 'update', 'delete'];
+
+// 現在のページがリストに含まれている場合は、ログイン状態をチェックする
+if (in_array($page, $requireLoginPages)) {
+    requireLogin(); // 未ログインならログイン画面へリダイレクト（弾かれる）
+}
+// ==========================================
+
+// ルーティング
 switch ($page) {
-    case 'index':
-        $controller->index();
+
+    case 'login':
+        $authController->loginForm();
         break;
 
-    // ▼▼▼ ここから下は課題で実装します（コントローラ側の TODO を埋める）▼▼▼
+    case 'login_post':
+        $authController->login();
+        break;
+
+    case 'logout':
+        $authController->logout();
+        break;
+
+    case 'index':
+        $bookController->index();
+        break;
+
     case 'create':
-        $controller->create();
+        $bookController->create();
         break;
+
     case 'store':
-        $controller->store();
+        $bookController->store();
         break;
+
     case 'edit':
-        $controller->edit();
+        $bookController->edit();
         break;
+
     case 'update':
-        $controller->update();
+        $bookController->update();
         break;
+
     case 'delete':
-        $controller->delete();
+        $bookController->delete();
         break;
-    // ▲▲▲ ここまで ▲▲▲
+
+    case 'register':
+        $authController->registerForm();
+        break;
+
+    case 'register_post':
+        $authController->register();
+        break;
 
     default:
-        http_response_code(404);
-        echo 'Not Found';
+        $bookController->index();
+        break;
 }

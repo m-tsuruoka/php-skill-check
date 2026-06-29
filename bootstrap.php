@@ -1,5 +1,8 @@
 <?php
+session_start();
 
+require_once __DIR__ . '/src/Models/Book.php';
+require_once __DIR__ . '/src/Models/User.php';
 /**
  * 簡易オートローダ（PSR-4 相当）と共通読み込み。
  * App\Foo\Bar  ->  src/Foo/Bar.php に対応させる。
@@ -37,4 +40,13 @@ function view(string $name, array $data = [], string $title = '書籍管理'): v
 function e(?string $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
+
+function requireLogin(): void
+{
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /?page=login');
+        exit;
+    }
 }

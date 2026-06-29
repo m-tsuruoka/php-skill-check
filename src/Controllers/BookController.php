@@ -188,6 +188,7 @@ public function update(): void
     /** ★応用課題: 削除処理 */
     public function delete(): void
     {
+        requireLogin();
         $id = $_POST['id'] ?? null;
 
         if (!$id) {
