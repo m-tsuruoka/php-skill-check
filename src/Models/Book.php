@@ -29,28 +29,34 @@ class Book
      */
     public static function find(int $id): ?array
     {
-        // TODO: ここを実装する
-        return null;
+    $stmt = db()->prepare('SELECT * FROM books WHERE id = :id');
+    $stmt->execute([
+        ':id' => $id,
+    ]);
+
+    $book = $stmt->fetch();
+
+    return $book ?: null;
     }
 
     /**
      * ★基礎/応用課題: 新規登録
      * ヒント: INSERT 文を prepare() し、execute() に連想配列 or 配列で値を渡す。
      */
-public static function create(array $data): void
-{
-    $sql = 'INSERT INTO books (title, author, category_id, price)
+    public static function create(array $data): void
+    {
+        $sql = 'INSERT INTO books (title, author, category_id, price)
             VALUES (:title, :author, :category_id, :price)';
 
-    $stmt = db()->prepare($sql);
+        $stmt = db()->prepare($sql);
 
-    $stmt->execute([
-        ':title'       => $data['title'],
-        ':author'      => $data['author'],
-        ':category_id' => $data['category_id'],
-        ':price'       => $data['price'],
-    ]);
-}
+        $stmt->execute([
+            ':title'       => $data['title'],
+            ':author'      => $data['author'],
+            ':category_id' => $data['category_id'],
+            ':price'       => $data['price'],
+        ]);
+    }
 
     /**
      * ★応用課題: 更新
@@ -59,6 +65,24 @@ public static function create(array $data): void
     public static function update(int $id, array $data): void
     {
         // TODO: ここを実装する
+            $sql = '
+        UPDATE books
+        SET title = :title,
+            author = :author,
+            category_id = :category_id,
+            price = :price
+        WHERE id = :id
+    ';
+
+    $stmt = db()->prepare($sql);
+
+    $stmt->execute([
+        ':id'          => $id,
+        ':title'       => $data['title'],
+        ':author'      => $data['author'],
+        ':category_id' => $data['category_id'],
+        ':price'       => $data['price'],
+    ]);
     }
 
     /**
@@ -67,6 +91,10 @@ public static function create(array $data): void
      */
     public static function delete(int $id): void
     {
-        // TODO: ここを実装する
+        $stmt = db()->prepare('DELETE FROM books WHERE id = :id');
+        $stmt->execute([
+            ':id' => $id,
+        ]);
     }
+
 }

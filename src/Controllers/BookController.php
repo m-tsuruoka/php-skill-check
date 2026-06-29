@@ -12,7 +12,7 @@ use App\Models\Category;
 class BookController
 {
     /** 一覧表示（実装済みの見本） */
-     public function index(): void
+    public function index(): void
     {
         $books = Book::all();
         view('books/index', ['books' => $books]);
@@ -103,23 +103,101 @@ class BookController
     }
 
     /** ★応用課題: 編集フォームの表示（?page=edit&id=...） */
-    public function edit(): void
+public function edit(): void
     {
-        // TODO: ここを実装する（下の仮表示を本実装に置き換える）
-        //   $book = Book::find($_GET['id'] ?? null);
-        //   view('books/edit', ['book' => $book, 'categories' => Category::all(), 'errors' => []]);
-        view('books/edit'); // 仮表示（実装前の白画面防止。実装時に上記へ置き換える）
+        $id = (int)($_GET['id'] ?? 0);
+        $book = Book::find($id);
+
+        // ★ 追加: 本が見つからなかった場合（nullだった場合）は一覧へ戻す
+        if (!$book) {
+            header('Location: /?page=index');
+            exit;
+        }
+
+        $categories = Category::all();
+        $errors = $_GET['errors'] ?? [];
+        $old = $_GET['old'] ?? [];
+
+        view('books/edit', [
+            'book' => $book,
+            'categories' => $categories,
+            'errors' => $errors,
+            'old' => $old,
+        ]);
     }
 
     /** ★応用課題: 更新処理（POST） */
-    public function update(): void
+public function update(): void
     {
-        // TODO: ここを実装する
+        // POSTから値を受け取る
+        $id = $_POST['id'] ?? null;
+        $title = isset($_POST['title']) ? trim($_POST['title']) : '';
+        $author = isset($_POST['author']) ? trim($_POST['author']) : '';
+        $category_id = isset($_POST['category_id']) ? trim($_POST['category_id']) : '';
+        $price = isset($_POST['price']) ? trim($_POST['price']) : '';
+        $errors = [];
+
+        // バリデーション (storeと同じ)
+        if ($title == '') {
+            $errors['title'] = 'タイトルは必須です';
+        } elseif (mb_strlen($title) > 100) {
+            $errors['title'] = 'タイトルは100字以内で入力してください';
+        }
+        if ($author === '') {
+            $errors['author'] = '著者は必須です。';
+        }
+        if ($category_id === '') {
+            $errors['category_id'] = 'カテゴリは必須です。';
+        }
+        if ($price === '') {
+            $errors['price'] = '価格は必須です。';
+        } elseif (!is_numeric($price) || (int)$price < 0) {
+            $errors['price'] = '価格は0以上の数値で入力してください。';
+        }
+
+        // エラーがあった場合は編集画面(edit)へリダイレクト
+        if (!empty($errors)) {
+            $query = http_build_query([
+                'id' => $id, // URLにIDを含めることで、どの本の編集か維持する
+                'errors' => $errors,
+                'old' => [
+                    'title' => $title,
+                    'author' => $author,
+                    'category_id' => $category_id,
+                    'price' => $price,
+                ]
+            ]);
+            header('Location: /?page=edit&' . $query);
+            exit;
+        }
+
+        // OKならDBを更新
+        // ※注意: モデルに 'update' というメソッドが用意されている想定です
+        Book::update($id, [
+            'title'       => $title,
+            'author'      => $author,
+            'category_id' => $category_id,
+            'price'       => $price,
+        ]);
+
+        // 一覧へリダイレクト
+        header('Location: /?page=index&updated=1');
+        exit;
     }
 
     /** ★応用課題: 削除処理 */
     public function delete(): void
     {
-        // TODO: ここを実装する
+        $id = $_POST['id'] ?? null;
+
+        if (!$id) {
+            header('Location: /');
+            exit;
+        }
+
+        Book::delete((int)$id);
+
+        header('Location: /?page=index&deleted=1');
+        exit;
     }
 }
