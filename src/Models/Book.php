@@ -29,8 +29,14 @@ class Book
      */
     public static function find(int $id): ?array
     {
-        // TODO: ここを実装する
-        return null;
+    $stmt = db()->prepare('SELECT * FROM books WHERE id = :id');
+    $stmt->execute([
+        ':id' => $id,
+    ]);
+
+    $book = $stmt->fetch();
+
+    return $book ?: null;
     }
 
     /**
@@ -59,6 +65,24 @@ class Book
     public static function update(int $id, array $data): void
     {
         // TODO: ここを実装する
+            $sql = '
+        UPDATE books
+        SET title = :title,
+            author = :author,
+            category_id = :category_id,
+            price = :price
+        WHERE id = :id
+    ';
+
+    $stmt = db()->prepare($sql);
+
+    $stmt->execute([
+        ':id'          => $id,
+        ':title'       => $data['title'],
+        ':author'      => $data['author'],
+        ':category_id' => $data['category_id'],
+        ':price'       => $data['price'],
+    ]);
     }
 
     /**
@@ -72,4 +96,5 @@ class Book
             ':id' => $id,
         ]);
     }
+
 }
