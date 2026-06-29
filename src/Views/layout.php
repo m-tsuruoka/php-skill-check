@@ -23,6 +23,14 @@
     <h1><a href="/" style="text-decoration:none;color:inherit;">📚 書籍管理</a></h1>
     <nav>
       <a class="btn btn-primary" href="/?page=create">+ 新規登録</a>
+<?php if (isset($_SESSION['user_id'])): ?>
+        <a class="btn" href="/?page=logout" onclick="return confirm('ログアウトしますか？');" style="border-color: #dc3545; color: #dc3545;">ログアウト</a>
+      
+      <?php else: ?>
+        <a class="btn" href="/?page=register">ユーザー登録</a>
+        <a class="btn btn-primary" href="/?page=login">ログイン</a>
+      
+      <?php endif; ?>
     </nav>
   </header>
   <main>
