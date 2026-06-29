@@ -37,10 +37,20 @@ class Book
      * ★基礎/応用課題: 新規登録
      * ヒント: INSERT 文を prepare() し、execute() に連想配列 or 配列で値を渡す。
      */
-    public static function create(array $data): void
-    {
-        // TODO: ここを実装する
-    }
+public static function create(array $data): void
+{
+    $sql = 'INSERT INTO books (title, author, category_id, price)
+            VALUES (:title, :author, :category_id, :price)';
+
+    $stmt = db()->prepare($sql);
+
+    $stmt->execute([
+        ':title'       => $data['title'],
+        ':author'      => $data['author'],
+        ':category_id' => $data['category_id'],
+        ':price'       => $data['price'],
+    ]);
+}
 
     /**
      * ★応用課題: 更新
